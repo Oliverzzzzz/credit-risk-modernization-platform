@@ -17,3 +17,11 @@ Train the model to generate detailed metrics in:
 ```text
 artifacts/models/model_metrics.json
 ```
+
+Global explainability outputs are written to:
+
+```text
+artifacts/models/global_explainability.json
+```
+
+The explainability artifact is intended for governance review and business interpretation. It should be reviewed together with model performance metrics, threshold policy, and portfolio risk appetite.

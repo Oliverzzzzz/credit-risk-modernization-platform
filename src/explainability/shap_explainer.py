@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import json
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -69,3 +71,41 @@ class CreditRiskExplainer:
             if base_feature and float(row["contribution"]) > 0:
                 codes.append(REASON_CODE_MAP[base_feature])
         return codes[:3] or ["No dominant adverse driver identified"]
+
+
+def generate_global_explainability_artifact(model: Any, features: pd.DataFrame, output_dir: Path, top_n: int = 15) -> dict[str, Any]:
+    """Persist global model importance for governance and review workflows."""
+    estimator = model.steps[-1][1] if hasattr(model, "steps") else model
+    method = "model_feature_importance"
+
+    if hasattr(estimator, "feature_importances_"):
+        values = np.asarray(estimator.feature_importances_)
+    elif hasattr(estimator, "coef_"):
+        values = np.abs(np.asarray(estimator.coef_[0]))
+        method = "absolute_model_coefficients"
+    else:
+        values = np.zeros(features.shape[1])
+        method = "unavailable"
+
+    total = values.sum()
+    normalized = values / total if total > 0 else values
+    rows = [
+        {
+            "feature": column,
+            "importance": float(importance),
+            "business_reason": REASON_CODE_MAP.get(column, "Model-derived risk signal"),
+        }
+        for column, importance in zip(features.columns, normalized)
+    ]
+    rows = sorted(rows, key=lambda row: row["importance"], reverse=True)[:top_n]
+    artifact = {
+        "method": method,
+        "top_features": rows,
+        "governance_note": (
+            "Global importance supports model review and stakeholder interpretation. "
+            "Borrower-level decisions should use local explanations from the scoring API."
+        ),
+    }
+    output_dir.mkdir(parents=True, exist_ok=True)
+    (output_dir / "global_explainability.json").write_text(json.dumps(artifact, indent=2), encoding="utf-8")
+    return artifact

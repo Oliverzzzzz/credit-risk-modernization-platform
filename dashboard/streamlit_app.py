@@ -14,6 +14,7 @@ st.set_page_config(page_title="Credit Risk Modernization Dashboard", layout="wid
 st.title("Credit Risk Modernization Dashboard")
 
 metrics_path = MODEL_DIR / "model_metrics.json"
+explainability_path = MODEL_DIR / "global_explainability.json"
 log_path = LOG_DIR / "predictions.jsonl"
 
 left, right = st.columns(2)
@@ -37,6 +38,16 @@ with right:
             st.plotly_chart(fig, use_container_width=True)
     else:
         st.info("No prediction logs are available yet.")
+
+st.subheader("Global Explainability")
+if explainability_path.exists():
+    explainability = json.loads(explainability_path.read_text(encoding="utf-8"))
+    importance = pd.DataFrame(explainability["top_features"])
+    fig = px.bar(importance, x="importance", y="feature", orientation="h", title="Top Model Risk Drivers")
+    st.plotly_chart(fig, use_container_width=True)
+    st.caption(explainability["governance_note"])
+else:
+    st.info("Train the model to generate global explainability artifacts.")
 
 st.subheader("Portfolio Monitoring Notes")
 st.write(

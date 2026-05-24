@@ -138,6 +138,7 @@ Training writes artifacts to `artifacts/models/`, including:
 - `model_metadata.json`
 - `model_metrics.json`
 - `feature_schema.json`
+- `global_explainability.json`
 
 ## Explainability
 
@@ -147,6 +148,7 @@ Governance outputs are intended to support:
 
 - Local borrower-level explanations.
 - Global feature importance.
+- Persisted model review artifacts.
 - Model risk review.
 - Business stakeholder interpretation.
 

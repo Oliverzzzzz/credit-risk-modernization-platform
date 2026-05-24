@@ -13,6 +13,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
 from src.evaluation.metrics import evaluate_binary_classifier, optimize_threshold
+from src.explainability.shap_explainer import generate_global_explainability_artifact
 from src.feature_engineering.features import CreditFeatureEngineer
 from src.preprocessing.pipeline import CreditDataPreprocessor
 from src.preprocessing.schema import TARGET_COLUMN
@@ -116,8 +117,9 @@ def train_credit_risk_model(data: pd.DataFrame, output_dir: Path = MODEL_DIR) ->
     (output_dir / "model_metadata.json").write_text(json.dumps(metadata, indent=2), encoding="utf-8")
     (output_dir / "model_metrics.json").write_text(json.dumps(results, indent=2), encoding="utf-8")
     (output_dir / "feature_schema.json").write_text(json.dumps({"features": list(x.columns)}, indent=2), encoding="utf-8")
+    global_explainability = generate_global_explainability_artifact(best_model, x_train, output_dir)
 
-    return {"model": best_model, "metadata": metadata, "metrics": results}
+    return {"model": best_model, "metadata": metadata, "metrics": results, "global_explainability": global_explainability}
 
 
 def load_training_data(input_path: str | None, generate_sample: bool) -> pd.DataFrame:
