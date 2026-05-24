@@ -12,7 +12,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
-from src.evaluation.metrics import evaluate_binary_classifier
+from src.evaluation.metrics import evaluate_binary_classifier, optimize_threshold
 from src.feature_engineering.features import CreditFeatureEngineer
 from src.preprocessing.pipeline import CreditDataPreprocessor
 from src.preprocessing.schema import TARGET_COLUMN
@@ -31,7 +31,7 @@ def build_training_matrix(data: pd.DataFrame) -> tuple[pd.DataFrame, pd.Series]:
 
 def train_models(x_train: pd.DataFrame, y_train: pd.Series) -> dict[str, object]:
     class_weight = "balanced"
-    return {
+    models: dict[str, object] = {
         "logistic_regression": Pipeline(
             steps=[
                 ("scaler", StandardScaler()),
@@ -50,14 +50,41 @@ def train_models(x_train: pd.DataFrame, y_train: pd.Series) -> dict[str, object]
             n_jobs=-1,
         ).fit(x_train, y_train),
     }
+    try:
+        from xgboost import XGBClassifier
+
+        positive_rate = y_train.mean()
+        scale_pos_weight = (1 - positive_rate) / positive_rate if positive_rate > 0 else 1
+        models["xgboost"] = XGBClassifier(
+            n_estimators=150,
+            max_depth=4,
+            learning_rate=0.05,
+            subsample=0.9,
+            colsample_bytree=0.9,
+            eval_metric="logloss",
+            scale_pos_weight=scale_pos_weight,
+            random_state=DEFAULT_MODEL_CONFIG.random_state,
+        ).fit(x_train, y_train)
+    except ImportError:
+        pass
+    return models
 
 
-def select_best_model(models: dict[str, object], x_test: pd.DataFrame, y_test: pd.Series) -> tuple[str, object, dict[str, float]]:
+def select_best_model(models: dict[str, object], x_test: pd.DataFrame, y_test: pd.Series) -> tuple[str, object, dict[str, object]]:
     results: dict[str, dict[str, float]] = {}
     for name, model in models.items():
         probabilities = model.predict_proba(x_test)[:, 1]
-        results[name] = evaluate_binary_classifier(y_test.to_numpy(), probabilities)
-    best_name = max(results, key=lambda model_name: results[model_name]["roc_auc"])
+        threshold_policy = optimize_threshold(y_test.to_numpy(), probabilities)
+        results[name] = {
+            "default": evaluate_binary_classifier(y_test.to_numpy(), probabilities),
+            "optimized": evaluate_binary_classifier(
+                y_test.to_numpy(),
+                probabilities,
+                threshold=threshold_policy["optimized_threshold"],
+            ),
+            "threshold_policy": threshold_policy,
+        }
+    best_name = max(results, key=lambda model_name: results[model_name]["default"]["roc_auc"])
     return best_name, models[best_name], results
 
 
@@ -84,6 +111,7 @@ def train_credit_risk_model(data: pd.DataFrame, output_dir: Path = MODEL_DIR) ->
         "target_column": TARGET_COLUMN,
         "feature_count": len(x.columns),
         "feature_names": list(x.columns),
+        "threshold_policy": results[best_name]["threshold_policy"],
     }
     (output_dir / "model_metadata.json").write_text(json.dumps(metadata, indent=2), encoding="utf-8")
     (output_dir / "model_metrics.json").write_text(json.dumps(results, indent=2), encoding="utf-8")

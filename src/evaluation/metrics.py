@@ -18,6 +18,31 @@ def evaluate_binary_classifier(y_true: np.ndarray, probabilities: np.ndarray, th
     }
 
 
+def optimize_threshold(y_true: np.ndarray, probabilities: np.ndarray) -> dict[str, float]:
+    """Select an operating threshold that balances recall and precision for review workflows."""
+    candidate_thresholds = np.arange(0.20, 0.81, 0.05)
+    scored_thresholds = []
+    for threshold in candidate_thresholds:
+        metrics = evaluate_binary_classifier(y_true, probabilities, float(threshold))
+        scored_thresholds.append(
+            {
+                "threshold": float(threshold),
+                "f1": metrics["f1"],
+                "precision": metrics["precision"],
+                "recall": metrics["recall"],
+            }
+        )
+    best = max(scored_thresholds, key=lambda row: row["f1"])
+    return {
+        "default_threshold": 0.5,
+        "optimized_threshold": best["threshold"],
+        "optimization_metric": "f1",
+        "precision_at_threshold": best["precision"],
+        "recall_at_threshold": best["recall"],
+        "f1_at_threshold": best["f1"],
+    }
+
+
 def assign_risk_tier(probability: float, low_max: float = 0.25, medium_max: float = 0.55) -> str:
     if probability < low_max:
         return "Low Risk"

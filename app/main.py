@@ -86,6 +86,7 @@ def _score_payload(payload: ApplicantPayload) -> dict[str, Any]:
     model, metadata, feature_names = _load_artifacts()
     features = _prepare_features([payload], feature_names)
     probability = float(model.predict_proba(features)[:, 1][0])
+    threshold_policy = metadata.get("threshold_policy", {})
     tier = assign_risk_tier(
         probability,
         low_max=DEFAULT_MODEL_CONFIG.thresholds.low_max,
@@ -97,6 +98,7 @@ def _score_payload(payload: ApplicantPayload) -> dict[str, Any]:
         "risk_tier": tier,
         "model_version": metadata["model_version"],
         "model_name": metadata["model_name"],
+        "decision_threshold": threshold_policy.get("optimized_threshold", 0.5),
         "reason_codes": explanation.reason_codes,
         "top_features": explanation.top_features,
         "explanation_method": explanation.method,
