@@ -524,15 +524,40 @@ Key files:
 - `src/data_ingestion/cli.py`
 - `tests/test_data_ingestion.py`
 
-## 27. Current Gaps To Learn Next
+## 27. Data Quality Reporting
+
+### Concept
+
+Data quality reporting verifies whether source data is complete, valid, and usable before model training or scoring. It is a core enterprise ML control because bad input data can create unreliable model outputs.
+
+### How This Project Applies It
+
+The project now generates JSON data quality reports with:
+
+- row and column counts
+- missing column checks
+- missing value summary
+- numeric range validation
+- categorical distributions
+- target balance summary
+
+Training automatically writes a report, and a standalone CLI can generate one for mapped source datasets.
+
+Key files:
+
+- `docs/DATA_QUALITY_REPORTING.md`
+- `src/data_ingestion/quality.py`
+- `src/data_ingestion/quality_cli.py`
+- `tests/test_data_quality.py`
+
+## 28. Current Gaps To Learn Next
 
 The next learning and implementation areas are:
 
-1. Data quality reports and validation summaries.
-2. Stronger drift and monitoring reports.
-3. Batch scoring workflow for portfolio-level review.
-4. Model card and governance documentation.
-5. Dashboard improvements for portfolio risk exploration.
-6. Deployment documentation for cloud environments.
+1. Stronger drift and monitoring reports.
+2. Batch scoring workflow for portfolio-level review.
+3. Model card and governance documentation.
+4. Dashboard improvements for portfolio risk exploration.
+5. Deployment documentation for cloud environments.
 
 These map directly to the remaining work in `PROJECT_SPEC.md`.

@@ -13,6 +13,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
 from src.data_ingestion.loader import load_credit_dataset
+from src.data_ingestion.quality import write_data_quality_report
 from src.evaluation.metrics import evaluate_binary_classifier, optimize_threshold
 from src.explainability.shap_explainer import generate_global_explainability_artifact
 from src.feature_engineering.features import CreditFeatureEngineer
@@ -92,6 +93,7 @@ def select_best_model(models: dict[str, object], x_test: pd.DataFrame, y_test: p
 
 def train_credit_risk_model(data: pd.DataFrame, output_dir: Path = MODEL_DIR) -> dict[str, object]:
     ensure_project_directories()
+    data_quality = write_data_quality_report(data)
     x, y = build_training_matrix(data)
     x_train, x_test, y_train, y_test = train_test_split(
         x,
@@ -120,7 +122,13 @@ def train_credit_risk_model(data: pd.DataFrame, output_dir: Path = MODEL_DIR) ->
     (output_dir / "feature_schema.json").write_text(json.dumps({"features": list(x.columns)}, indent=2), encoding="utf-8")
     global_explainability = generate_global_explainability_artifact(best_model, x_train, output_dir)
 
-    return {"model": best_model, "metadata": metadata, "metrics": results, "global_explainability": global_explainability}
+    return {
+        "model": best_model,
+        "metadata": metadata,
+        "metrics": results,
+        "global_explainability": global_explainability,
+        "data_quality": data_quality,
+    }
 
 
 def load_training_data(input_path: str | None, generate_sample: bool, mapping_name: str = "canonical") -> pd.DataFrame:
