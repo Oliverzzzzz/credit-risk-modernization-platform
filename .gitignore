@@ -11,9 +11,11 @@ venv/
 artifacts/models/*.joblib
 artifacts/models/*.json
 artifacts/logs/*.jsonl
+artifacts/reports/*.json
 data/raw/*.csv
 data/processed/*.csv
 !data/raw/.gitkeep
 !data/processed/.gitkeep
 !artifacts/models/.gitkeep
 !artifacts/logs/.gitkeep
+!artifacts/reports/.gitkeep

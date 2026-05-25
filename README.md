@@ -151,6 +151,15 @@ python -m src.data_ingestion.cli \
   --mapping lending_club
 ```
 
+To generate a standalone data quality report:
+
+```bash
+python -m src.data_ingestion.quality_cli \
+  --input data/raw/lending_club_sample.csv \
+  --mapping lending_club \
+  --output artifacts/reports/data_quality_report.json
+```
+
 Training writes artifacts to `artifacts/models/`, including:
 
 - `credit_risk_model.joblib`
@@ -158,6 +167,12 @@ Training writes artifacts to `artifacts/models/`, including:
 - `model_metrics.json`
 - `feature_schema.json`
 - `global_explainability.json`
+
+Training also writes a data quality report to:
+
+```text
+artifacts/reports/data_quality_report.json
+```
 
 ## Explainability
 
