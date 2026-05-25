@@ -385,14 +385,16 @@ Monitoring checks whether a model and service are behaving as expected after dep
 The current implementation includes:
 
 - API counters
+- prediction score distribution summaries
 - prediction logs
 - `/metrics` endpoint
-- drift utility using population stability index
+- drift report generation using Population Stability Index
 
 Key files:
 
 - `src/monitoring/metrics.py`
 - `src/monitoring/drift.py`
+- `src/monitoring/drift_cli.py`
 - `app/main.py`
 
 ## 20. Data Drift
@@ -403,11 +405,13 @@ Data drift happens when production input data changes compared with training dat
 
 ### How This Project Applies It
 
-The project includes a population stability index utility that compares reference and current feature distributions.
+The project includes Population Stability Index utilities and a persisted drift report generator that compares reference and current feature distributions.
 
-Key file:
+Key files:
 
 - `src/monitoring/drift.py`
+- `src/monitoring/drift_cli.py`
+- `docs/MONITORING_DESIGN.md`
 
 ## 21. Streamlit Dashboard
 
@@ -554,10 +558,9 @@ Key files:
 
 The next learning and implementation areas are:
 
-1. Stronger drift and monitoring reports.
-2. Batch scoring workflow for portfolio-level review.
-3. Model card and governance documentation.
-4. Dashboard improvements for portfolio risk exploration.
-5. Deployment documentation for cloud environments.
+1. Batch scoring workflow for portfolio-level review.
+2. Model card and governance documentation.
+3. Dashboard improvements for portfolio risk exploration.
+4. Deployment documentation for cloud environments.
 
 These map directly to the remaining work in `PROJECT_SPEC.md`.

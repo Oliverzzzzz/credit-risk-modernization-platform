@@ -191,10 +191,20 @@ Governance outputs are intended to support:
 Runtime monitoring includes:
 
 - JSONL prediction logs in `artifacts/logs/predictions.jsonl`.
-- API counters exposed at `/metrics`.
+- API counters and score distribution summaries exposed at `/metrics`.
 - Drift comparison utilities in `src/monitoring/drift.py`.
+- PSI drift report generation in `artifacts/reports/drift_report.json`.
 
 The monitoring implementation is intentionally lightweight, but it mirrors the operational concerns an enterprise team would address before production deployment.
+
+Generate a drift report from reference and current datasets:
+
+```bash
+python -m src.monitoring.drift_cli \
+  --reference data/processed/reference_features.csv \
+  --current data/processed/current_features.csv \
+  --output artifacts/reports/drift_report.json
+```
 
 ## Docker
 
