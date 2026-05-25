@@ -12,6 +12,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
+from src.data_ingestion.loader import load_credit_dataset
 from src.evaluation.metrics import evaluate_binary_classifier, optimize_threshold
 from src.explainability.shap_explainer import generate_global_explainability_artifact
 from src.feature_engineering.features import CreditFeatureEngineer
@@ -122,22 +123,23 @@ def train_credit_risk_model(data: pd.DataFrame, output_dir: Path = MODEL_DIR) ->
     return {"model": best_model, "metadata": metadata, "metrics": results, "global_explainability": global_explainability}
 
 
-def load_training_data(input_path: str | None, generate_sample: bool) -> pd.DataFrame:
+def load_training_data(input_path: str | None, generate_sample: bool, mapping_name: str = "canonical") -> pd.DataFrame:
     if generate_sample or input_path is None:
         sample = generate_credit_sample()
         RAW_DATA_DIR.mkdir(parents=True, exist_ok=True)
         sample.to_csv(RAW_DATA_DIR / "sample_credit_applications.csv", index=False)
         return sample
-    return pd.read_csv(input_path)
+    return load_credit_dataset(input_path, mapping_name=mapping_name, require_target=True)
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Train credit risk models.")
     parser.add_argument("--input", help="Path to a training CSV.", default=None)
+    parser.add_argument("--mapping", help="Named data ingestion mapping.", default="canonical")
     parser.add_argument("--generate-sample", action="store_true", help="Generate development fixture data before training.")
     args = parser.parse_args()
 
-    data = load_training_data(args.input, args.generate_sample)
+    data = load_training_data(args.input, args.generate_sample, args.mapping)
     result = train_credit_risk_model(data)
     print(json.dumps({"selected_model": result["metadata"]["model_name"], "metrics": result["metrics"]}, indent=2))
 
