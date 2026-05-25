@@ -500,16 +500,39 @@ Key file:
 
 - `sql/schema.sql`
 
-## 26. Current Gaps To Learn Next
+## 26. Dataset Mapping
+
+### Concept
+
+Real datasets rarely arrive in the exact format a model expects. Dataset mapping translates source-specific columns and business definitions into a canonical schema used by the rest of the platform.
+
+### How This Project Applies It
+
+The ingestion layer supports named mappings for:
+
+- canonical platform data
+- LendingClub-style data
+- Give Me Some Credit-style data
+
+The training command can now accept a mapping profile, and a separate CLI can convert source CSVs into the canonical schema.
+
+Key files:
+
+- `docs/DATA_CONTRACT.md`
+- `src/data_ingestion/mappings.py`
+- `src/data_ingestion/loader.py`
+- `src/data_ingestion/cli.py`
+- `tests/test_data_ingestion.py`
+
+## 27. Current Gaps To Learn Next
 
 The next learning and implementation areas are:
 
-1. Real dataset ingestion and mapping to the project schema.
-2. Data quality reports and validation summaries.
-3. Stronger drift and monitoring reports.
-4. Batch scoring workflow for portfolio-level review.
-5. Model card and governance documentation.
-6. Dashboard improvements for portfolio risk exploration.
-7. Deployment documentation for cloud environments.
+1. Data quality reports and validation summaries.
+2. Stronger drift and monitoring reports.
+3. Batch scoring workflow for portfolio-level review.
+4. Model card and governance documentation.
+5. Dashboard improvements for portfolio risk exploration.
+6. Deployment documentation for cloud environments.
 
 These map directly to the remaining work in `PROJECT_SPEC.md`.

@@ -62,6 +62,8 @@ credit-risk-modernization-platform/
 
 The platform is designed for realistic public financial datasets such as Home Credit Default Risk, LendingClub, or Give Me Some Credit. For local development and CI, the code can generate a synthetic credit-like fixture with business-oriented fields. That fixture exists only to prove the platform workflow before a real dataset is connected.
 
+Dataset-specific CSVs should be mapped into the platform's canonical schema before training. The canonical data contract is documented in `docs/DATA_CONTRACT.md`.
+
 Expected target column:
 
 ```text
@@ -126,10 +128,27 @@ curl -X POST http://127.0.0.1:8000/predict \
 python -m src.training.train_model --input data/raw/credit_applications.csv
 ```
 
+For a supported source dataset, pass the mapping profile:
+
+```bash
+python -m src.training.train_model \
+  --input data/raw/lending_club_sample.csv \
+  --mapping lending_club
+```
+
 If no input file is available:
 
 ```bash
 python -m src.training.train_model --generate-sample
+```
+
+To map a source CSV into the canonical schema without training:
+
+```bash
+python -m src.data_ingestion.cli \
+  --input data/raw/lending_club_sample.csv \
+  --output data/processed/canonical_credit_applications.csv \
+  --mapping lending_club
 ```
 
 Training writes artifacts to `artifacts/models/`, including:
