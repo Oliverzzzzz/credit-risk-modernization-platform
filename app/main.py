@@ -104,7 +104,7 @@ def _score_payload(payload: ApplicantPayload) -> dict[str, Any]:
         "explanation_method": explanation.method,
         "scored_at": datetime.now(UTC).isoformat(),
     }
-    metrics.record_prediction(tier)
+    metrics.record_prediction(tier, probability)
     prediction_logger.write(
         {
             "risk_probability": response["risk_probability"],
