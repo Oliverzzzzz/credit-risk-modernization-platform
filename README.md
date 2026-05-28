@@ -202,6 +202,13 @@ Training also writes a data quality report to:
 artifacts/reports/data_quality_report.json
 ```
 
+Generate a model governance report from training artifacts:
+
+```bash
+python -m src.evaluation.governance_cli \
+  --output artifacts/reports/model_governance_report.json
+```
+
 ## Explainability
 
 The explainability layer uses SHAP where possible and falls back to model-native importance when needed. API prediction responses include reason codes such as elevated debt-to-income, high revolving utilization, adverse delinquency history, or limited credit history.
@@ -211,6 +218,7 @@ Governance outputs are intended to support:
 - Local borrower-level explanations.
 - Global feature importance.
 - Persisted model review artifacts.
+- Model card and governance review documentation.
 - Model risk review.
 - Business stakeholder interpretation.
 
