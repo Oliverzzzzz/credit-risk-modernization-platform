@@ -96,10 +96,12 @@ streamlit run dashboard/streamlit_app.py
 
 ## API Examples
 
+The API returns an `X-Request-ID` header for traceability. Clients can provide their own request ID:
+
 Health check:
 
 ```bash
-curl http://127.0.0.1:8000/health
+curl -H "X-Request-ID: demo-health-check" http://127.0.0.1:8000/health
 ```
 
 Single prediction:
@@ -107,6 +109,7 @@ Single prediction:
 ```bash
 curl -X POST http://127.0.0.1:8000/predict \
   -H "Content-Type: application/json" \
+  -H "X-Request-ID: demo-score-001" \
   -d '{
     "annual_income": 85000,
     "debt_to_income": 0.28,
@@ -121,6 +124,10 @@ curl -X POST http://127.0.0.1:8000/predict \
     "loan_purpose": "debt_consolidation"
   }'
 ```
+
+The `/batch_predict` API accepts up to 100 applicants per request. Larger portfolio scoring jobs should use the batch scoring CLI.
+
+Validation errors use a structured response with an error code, message, request ID, and validation details.
 
 ## Model Training
 

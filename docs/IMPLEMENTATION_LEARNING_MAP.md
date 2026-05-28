@@ -482,7 +482,7 @@ Current tests cover:
 - training artifact creation
 - API health and prediction endpoints
 - explainability outputs
-- data ingestion, data quality, monitoring, and batch scoring
+- data ingestion, data quality, monitoring, batch scoring, and API hardening
 
 Key directory:
 
@@ -572,13 +572,34 @@ Key files:
 - `src/scoring/batch_score.py`
 - `tests/test_batch_scoring.py`
 
-## 29. Current Gaps To Learn Next
+## 29. API Hardening
+
+### Concept
+
+API hardening makes a service safer and more predictable for downstream systems. It includes request validation, structured errors, request tracing, input size limits, and health checks that expose dependency readiness.
+
+### How This Project Applies It
+
+The FastAPI service now includes:
+
+- request ID propagation through `X-Request-ID`
+- structured validation error responses
+- category validation for applicant fields
+- batch size limits for `/batch_predict`
+- artifact-level health reporting
+
+Key files:
+
+- `docs/API_HARDENING.md`
+- `app/main.py`
+- `tests/test_api.py`
+
+## 30. Current Gaps To Learn Next
 
 The next learning and implementation areas are:
 
 1. Model card and governance documentation.
 2. Dashboard improvements for portfolio risk exploration.
 3. Deployment documentation for cloud environments.
-4. API hardening and structured error handling.
 
 These map directly to the remaining work in `PROJECT_SPEC.md`.
