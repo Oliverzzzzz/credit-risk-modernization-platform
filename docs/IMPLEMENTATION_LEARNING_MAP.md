@@ -441,10 +441,12 @@ Dashboards help stakeholders inspect model behavior, scoring activity, and risk 
 
 The dashboard currently displays:
 
-- model metrics
-- prediction activity
-- risk tier distribution
+- portfolio risk distribution
+- prediction activity and recent logs
+- model metrics and threshold comparison
 - global explainability chart
+- data quality and drift reports
+- governance summary
 
 Key file:
 
@@ -616,7 +618,6 @@ Key files:
 
 The next learning and implementation areas are:
 
-1. Dashboard improvements for portfolio risk exploration.
-2. Deployment documentation for cloud environments.
+1. Deployment documentation for cloud environments.
 
 These map directly to the remaining work in `PROJECT_SPEC.md`.
