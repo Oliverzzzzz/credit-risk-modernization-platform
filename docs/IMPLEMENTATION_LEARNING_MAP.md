@@ -293,6 +293,24 @@ Key file:
 
 - `src/explainability/shap_explainer.py`
 
+## 14.1 Model Governance
+
+### Concept
+
+Model governance is the set of controls, documents, and review processes that make ML systems auditable and appropriate for their intended use. In financial services, governance typically covers intended use, limitations, data quality, model evaluation, explainability, monitoring, and approval requirements.
+
+### How This Project Applies It
+
+The project now includes a model card, governance checklist, and generated governance report. These documents clarify that the platform is a modernization simulation, not a regulated credit approval engine.
+
+Key files:
+
+- `docs/MODEL_CARD.md`
+- `docs/GOVERNANCE_CHECKLIST.md`
+- `src/evaluation/governance_report.py`
+- `src/evaluation/governance_cli.py`
+- `tests/test_governance_report.py`
+
 ## 15. Reason Codes
 
 ### Concept
@@ -598,8 +616,7 @@ Key files:
 
 The next learning and implementation areas are:
 
-1. Model card and governance documentation.
-2. Dashboard improvements for portfolio risk exploration.
-3. Deployment documentation for cloud environments.
+1. Dashboard improvements for portfolio risk exploration.
+2. Deployment documentation for cloud environments.
 
 These map directly to the remaining work in `PROJECT_SPEC.md`.
