@@ -94,6 +94,8 @@ Run the dashboard:
 streamlit run dashboard/streamlit_app.py
 ```
 
+The dashboard includes portfolio, model performance, explainability, monitoring, and governance review tabs.
+
 ## API Examples
 
 The API returns an `X-Request-ID` header for traceability. Clients can provide their own request ID:
