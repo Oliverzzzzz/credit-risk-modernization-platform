@@ -58,6 +58,16 @@ credit-risk-modernization-platform/
 └── requirements.txt
 ```
 
+## Enterprise Documentation
+
+- `docs/ARCHITECTURE_DIAGRAMS.md`
+- `docs/DEPLOYMENT_GUIDE.md`
+- `docs/DEPLOYMENT_CHECKLIST.md`
+- `docs/CICD_WORKFLOW.md`
+- `docs/MODEL_CARD.md`
+- `docs/GOVERNANCE_CHECKLIST.md`
+- `docs/IMPLEMENTATION_LEARNING_MAP.md`
+
 ## Data Strategy
 
 The platform is designed for realistic public financial datasets such as Home Credit Default Risk, LendingClub, or Give Me Some Credit. For local development and CI, the code can generate a synthetic credit-like fixture with business-oriented fields. That fixture exists only to prove the platform workflow before a real dataset is connected.
@@ -280,6 +290,8 @@ Recommended enterprise deployment path:
 - Add Prometheus/Grafana or managed observability.
 - Add scheduled retraining and drift review workflows.
 - Deploy to AWS ECS, Azure Container Apps, Google Cloud Run, or Kubernetes.
+
+See `docs/DEPLOYMENT_GUIDE.md` and `docs/ARCHITECTURE_DIAGRAMS.md` for deployment and architecture details.
 
 ## Resume-Aligned Summary
 

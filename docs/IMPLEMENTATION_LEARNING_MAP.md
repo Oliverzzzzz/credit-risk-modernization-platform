@@ -469,6 +469,8 @@ Key files:
 
 - `Dockerfile`
 - `docker-compose.yml`
+- `docs/DEPLOYMENT_GUIDE.md`
+- `docs/DEPLOYMENT_CHECKLIST.md`
 
 ## 23. CI/CD
 
@@ -487,6 +489,7 @@ GitHub Actions currently:
 Key file:
 
 - `.github/workflows/ci.yml`
+- `docs/CICD_WORKFLOW.md`
 
 ## 24. Testing
 
@@ -614,10 +617,29 @@ Key files:
 - `app/main.py`
 - `tests/test_api.py`
 
-## 30. Current Gaps To Learn Next
+## 30. Deployment Architecture
+
+### Concept
+
+Deployment architecture describes how model services, dashboards, artifacts, logs, and CI/CD workflows fit together in a real operating environment.
+
+### How This Project Applies It
+
+The project now includes Mermaid architecture diagrams, a local Docker deployment guide, a CI/CD workflow explanation, and a deployment readiness checklist.
+
+Key files:
+
+- `docs/ARCHITECTURE_DIAGRAMS.md`
+- `docs/DEPLOYMENT_GUIDE.md`
+- `docs/DEPLOYMENT_CHECKLIST.md`
+- `docs/CICD_WORKFLOW.md`
+
+## 31. Current Gaps To Learn Next
 
 The next learning and implementation areas are:
 
-1. Deployment documentation for cloud environments.
+1. Connect a larger real public credit dataset.
+2. Add fairness and bias analysis.
+3. Add screenshots after running the local UI.
 
 These map directly to the remaining work in `PROJECT_SPEC.md`.
