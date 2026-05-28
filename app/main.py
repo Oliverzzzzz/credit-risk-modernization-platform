@@ -74,6 +74,16 @@ def _error_response(code: str, message: str, request_id: str, status_code: int, 
     return JSONResponse(status_code=status_code, content=payload, headers={"X-Request-ID": request_id})
 
 
+def _safe_validation_errors(exc: RequestValidationError) -> list[dict[str, Any]]:
+    safe_errors = []
+    for error in exc.errors():
+        safe_error = dict(error)
+        if "ctx" in safe_error:
+            safe_error["ctx"] = {key: str(value) for key, value in safe_error["ctx"].items()}
+        safe_errors.append(safe_error)
+    return safe_errors
+
+
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
     return _error_response(
@@ -81,7 +91,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
         message="Request validation failed.",
         request_id=_request_id(request),
         status_code=422,
-        details=exc.errors(),
+        details=_safe_validation_errors(exc),
     )
 
 
