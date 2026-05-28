@@ -1,25 +1,13 @@
 from __future__ import annotations
 
-import json
 from datetime import UTC, datetime
-from pathlib import Path
 from typing import Any
 
-import joblib
-import pandas as pd
 from fastapi import FastAPI
 from pydantic import BaseModel, Field
 
-from src.evaluation.metrics import assign_risk_tier
-from src.explainability.shap_explainer import CreditRiskExplainer
-from src.feature_engineering.features import CreditFeatureEngineer, align_features
-from src.monitoring.logging import PredictionLogger
 from src.monitoring.metrics import ApiMetrics
-from src.preprocessing.pipeline import CreditDataPreprocessor
-from src.training.train_model import train_credit_risk_model
-from src.utils.config import DEFAULT_MODEL_CONFIG
-from src.utils.paths import MODEL_DIR, ensure_project_directories
-from src.utils.sample_data import generate_credit_sample
+from src.scoring.service import CreditRiskScoringService, artifact_paths
 
 
 class ApplicantPayload(BaseModel):
@@ -47,79 +35,19 @@ app = FastAPI(
 )
 
 metrics = ApiMetrics()
-prediction_logger = PredictionLogger()
-explainer = CreditRiskExplainer()
-
-
-def _artifact_paths() -> dict[str, Path]:
-    return {
-        "model": MODEL_DIR / "credit_risk_model.joblib",
-        "metadata": MODEL_DIR / "model_metadata.json",
-        "features": MODEL_DIR / "feature_schema.json",
-    }
-
-
-def _ensure_model_artifacts() -> None:
-    ensure_project_directories()
-    paths = _artifact_paths()
-    if not paths["model"].exists():
-        train_credit_risk_model(generate_credit_sample(rows=900), MODEL_DIR)
-
-
-def _load_artifacts() -> tuple[Any, dict[str, Any], list[str]]:
-    _ensure_model_artifacts()
-    paths = _artifact_paths()
-    model = joblib.load(paths["model"])
-    metadata = json.loads(paths["metadata"].read_text(encoding="utf-8"))
-    feature_schema = json.loads(paths["features"].read_text(encoding="utf-8"))
-    return model, metadata, feature_schema["features"]
-
-
-def _prepare_features(payloads: list[ApplicantPayload], feature_names: list[str]) -> pd.DataFrame:
-    raw = pd.DataFrame([payload.model_dump() for payload in payloads])
-    clean = CreditDataPreprocessor(require_target=False).transform(raw)
-    engineered = CreditFeatureEngineer().transform(clean)
-    return align_features(engineered, feature_names)
+scoring_service = CreditRiskScoringService()
 
 
 def _score_payload(payload: ApplicantPayload) -> dict[str, Any]:
-    model, metadata, feature_names = _load_artifacts()
-    features = _prepare_features([payload], feature_names)
-    probability = float(model.predict_proba(features)[:, 1][0])
-    threshold_policy = metadata.get("threshold_policy", {})
-    tier = assign_risk_tier(
-        probability,
-        low_max=DEFAULT_MODEL_CONFIG.thresholds.low_max,
-        medium_max=DEFAULT_MODEL_CONFIG.thresholds.medium_max,
-    )
-    explanation = explainer.explain_instance(model, features)
-    response = {
-        "risk_probability": round(probability, 6),
-        "risk_tier": tier,
-        "model_version": metadata["model_version"],
-        "model_name": metadata["model_name"],
-        "decision_threshold": threshold_policy.get("optimized_threshold", 0.5),
-        "reason_codes": explanation.reason_codes,
-        "top_features": explanation.top_features,
-        "explanation_method": explanation.method,
-        "scored_at": datetime.now(UTC).isoformat(),
-    }
-    metrics.record_prediction(tier, probability)
-    prediction_logger.write(
-        {
-            "risk_probability": response["risk_probability"],
-            "risk_tier": tier,
-            "model_version": metadata["model_version"],
-            "request": payload.model_dump(),
-        }
-    )
+    response = scoring_service.score_record(payload.model_dump())
+    metrics.record_prediction(response["risk_tier"], response["risk_probability"])
     return response
 
 
 @app.get("/health")
 def health() -> dict[str, Any]:
     metrics.health_check_count += 1
-    paths = _artifact_paths()
+    paths = artifact_paths()
     return {
         "status": "ok",
         "model_available": paths["model"].exists(),

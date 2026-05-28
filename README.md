@@ -160,6 +160,27 @@ python -m src.data_ingestion.quality_cli \
   --output artifacts/reports/data_quality_report.json
 ```
 
+## Batch Scoring
+
+Batch scoring simulates portfolio review workflows where many applicant records are scored together:
+
+```bash
+python -m src.scoring.batch_score \
+  --input data/raw/applicants.csv \
+  --output data/processed/batch_predictions.csv \
+  --mapping canonical
+```
+
+For faster scoring without reason-code generation:
+
+```bash
+python -m src.scoring.batch_score \
+  --input data/raw/applicants.csv \
+  --output data/processed/batch_predictions.csv \
+  --mapping canonical \
+  --no-explanations
+```
+
 Training writes artifacts to `artifacts/models/`, including:
 
 - `credit_risk_model.joblib`

@@ -482,6 +482,7 @@ Current tests cover:
 - training artifact creation
 - API health and prediction endpoints
 - explainability outputs
+- data ingestion, data quality, monitoring, and batch scoring
 
 Key directory:
 
@@ -554,13 +555,30 @@ Key files:
 - `src/data_ingestion/quality_cli.py`
 - `tests/test_data_quality.py`
 
-## 28. Current Gaps To Learn Next
+## 28. Batch Scoring
+
+### Concept
+
+Batch scoring applies a trained model to many records at once. Enterprises use batch scoring for portfolio review, back-office underwriting queues, periodic risk monitoring, and pre-deployment validation.
+
+### How This Project Applies It
+
+The project now has a reusable scoring service shared by FastAPI and the batch CLI. The CLI loads a source CSV, maps it to the canonical schema, scores each record, writes a prediction CSV, and logs prediction events for auditability.
+
+Key files:
+
+- `docs/BATCH_SCORING_WORKFLOW.md`
+- `src/scoring/service.py`
+- `src/scoring/batch_score.py`
+- `tests/test_batch_scoring.py`
+
+## 29. Current Gaps To Learn Next
 
 The next learning and implementation areas are:
 
-1. Batch scoring workflow for portfolio-level review.
-2. Model card and governance documentation.
-3. Dashboard improvements for portfolio risk exploration.
-4. Deployment documentation for cloud environments.
+1. Model card and governance documentation.
+2. Dashboard improvements for portfolio risk exploration.
+3. Deployment documentation for cloud environments.
+4. API hardening and structured error handling.
 
 These map directly to the remaining work in `PROJECT_SPEC.md`.
